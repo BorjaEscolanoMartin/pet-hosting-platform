@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PetController;
+use App\Http\Controllers\HostController;
 
 // Login
 Route::post('/login', function (Request $request) {
@@ -80,4 +81,11 @@ Route::get('/check', function (\Illuminate\Http\Request $request) {
         'user' => $request->user(),
     ]);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('hosts', HostController::class);
+});
+
+Route::middleware('auth:sanctum')->get('/hosts', [HostController::class, 'index']);
+
 

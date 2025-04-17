@@ -53,4 +53,15 @@ class User extends Authenticatable
         return $this->hasMany(Pet::class);
     }
 
+    public function host()
+    {
+        return $this->hasOne(Host::class);
+    }
+
+    public function hosts()
+    {
+        return $this->hasMany(Host::class);
+    }
+
+
 }

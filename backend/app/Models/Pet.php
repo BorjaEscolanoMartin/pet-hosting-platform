@@ -32,6 +32,12 @@ class Pet extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function host()
+    {
+        return $this->belongsTo(Host::class);
+    }
+
 }
 
 
