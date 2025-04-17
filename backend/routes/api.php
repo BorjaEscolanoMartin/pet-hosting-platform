@@ -71,6 +71,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/pets/{id}', [PetController::class, 'destroy']);
 });
 
+Route::middleware('auth:sanctum')->get('/pets/{id}', [PetController::class, 'show']);
+
 Route::get('/check', function (\Illuminate\Http\Request $request) {
     return response()->json([
         'cookies' => $_COOKIE,

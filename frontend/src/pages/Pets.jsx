@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import api from '../lib/axios'
 import axios from 'axios' // <- necesario para csrf-cookie
+import { Link } from 'react-router-dom';
 
+// ...
 export default function Pets() {
   const [pets, setPets] = useState([])
   const [form, setForm] = useState({
@@ -11,6 +13,7 @@ export default function Pets() {
     age: '',
     size: '',
     description: '',
+    photo: null, 
   })
   const [editingId, setEditingId] = useState(null)
   const [error, setError] = useState(null)
@@ -26,35 +29,54 @@ export default function Pets() {
   }, [])
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value, files } = e.target
+    if (name === 'photo') {
+      setForm({ ...form, photo: files[0] })
+    } else {
+      setForm({ ...form, [name]: value })
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
     setSuccess(false)
-
+  
     try {
-      // Obtener cookie CSRF antes de enviar datos
       await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
         withCredentials: true
       })
-
+  
+      const data = new FormData()
+      Object.keys(form).forEach((key) => {
+        if (form[key]) data.append(key, form[key])
+      })
+  
       if (editingId) {
-        await api.put(`/pets/${editingId}`, form)
+        await api.post(`/pets/${editingId}?_method=PUT`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
       } else {
-        await api.post('/pets', form)
+        await api.post('/pets', data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
       }
-
+  
       await fetchPets()
-      setForm({ name: '', species: '', breed: '', age: '', size: '', description: '' })
+      setForm({ name: '', species: '', breed: '', age: '', size: '', description: '', photo: null })
       setEditingId(null)
       setSuccess(true)
     } catch (err) {
       console.error(err)
+  
+      if (err.response?.data?.errors) {
+        console.log('Errores de validación:', err.response.data.errors)
+      }
+  
       setError('Error al guardar la mascota')
     }
   }
+  
 
   const handleEdit = (pet) => {
     setForm({
@@ -64,6 +86,7 @@ export default function Pets() {
       age: pet.age || '',
       size: pet.size || '',
       description: pet.description || '',
+      photo: null,
     })
     setEditingId(pet.id)
     setSuccess(false)
@@ -83,13 +106,20 @@ export default function Pets() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Mis Mascotas</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow-md max-w-md">
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow-md max-w-md" encType="multipart/form-data">
         <input name="name" placeholder="Nombre" value={form.name} onChange={handleChange} className="w-full border px-3 py-2 rounded" />
         <input name="species" placeholder="Especie" value={form.species} onChange={handleChange} className="w-full border px-3 py-2 rounded" />
         <input name="breed" placeholder="Raza" value={form.breed} onChange={handleChange} className="w-full border px-3 py-2 rounded" />
         <input name="age" type="number" placeholder="Edad" value={form.age} onChange={handleChange} className="w-full border px-3 py-2 rounded" />
         <input name="size" placeholder="Tamaño" value={form.size} onChange={handleChange} className="w-full border px-3 py-2 rounded" />
         <textarea name="description" placeholder="Descripción" value={form.description} onChange={handleChange} className="w-full border px-3 py-2 rounded" />
+        <input
+          type="file"
+          name="photo"
+          accept="image/*"
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded"
+        />
 
         {error && <p className="text-red-600">{error}</p>}
         {success && <p className="text-green-600">Mascota {editingId ? 'actualizada' : 'creada'} correctamente</p>}
@@ -103,7 +133,9 @@ export default function Pets() {
         {pets.map((pet) => (
           <li key={pet.id} className="bg-gray-100 p-3 rounded shadow-sm flex justify-between items-center">
             <div>
-              <strong>{pet.name}</strong> – {pet.species} ({pet.breed || 'Sin raza'}) – {pet.age} años
+              <Link to={`/mascotas/${pet.id}`} className="text-blue-600 hover:underline font-semibold">
+                {pet.name}
+              </Link> – {pet.species} ({pet.breed || 'Sin raza'}) – {pet.age} años
             </div>
             <div className="space-x-2">
               <button onClick={() => handleEdit(pet)} className="text-blue-600 hover:underline">Editar</button>
@@ -112,6 +144,13 @@ export default function Pets() {
           </li>
         ))}
       </ul>
+
+      <Link
+        to="/"
+        className="mt-6 inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+      >
+        Volver al Dashboard
+      </Link>
     </div>
   )
 }
