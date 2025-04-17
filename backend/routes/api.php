@@ -2,12 +2,20 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+
+use App\Models\User;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\HostController;
+use App\Http\Controllers\UserController;
+
+/*
+|--------------------------------------------------------------------------
+| Rutas Públicas
+|--------------------------------------------------------------------------
+*/
 
 // Login
 Route::post('/login', function (Request $request) {
@@ -16,9 +24,9 @@ Route::post('/login', function (Request $request) {
         'password' => 'required',
     ]);
 
-    $user = \App\Models\User::where('email', $request->email)->first();
+    $user = User::where('email', $request->email)->first();
 
-    if (! $user || ! \Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+    if (! $user || ! Hash::check($request->password, $user->password)) {
         throw ValidationException::withMessages([
             'email' => ['Credenciales incorrectas.'],
         ]);
@@ -53,39 +61,56 @@ Route::post('/register', function (Request $request) {
 
 // Logout
 Route::post('/logout', function (Request $request) {
-    Auth::logout();                         // Cierra la sesión
-    $request->session()->invalidate();      // Invalida la sesión actual
-    $request->session()->regenerateToken(); // Regenera el token CSRF
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
     return response()->json(['message' => 'Sesión cerrada']);
 });
 
-// Ruta protegida
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+/*
+|--------------------------------------------------------------------------
+| Rutas Protegidas con Sanctum
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('auth:sanctum')->group(function () {
+    // Usuario autenticado
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    // Mascotas
     Route::get('/pets', [PetController::class, 'index']);
     Route::post('/pets', [PetController::class, 'store']);
     Route::put('/pets/{id}', [PetController::class, 'update']);
     Route::delete('/pets/{id}', [PetController::class, 'destroy']);
+    Route::get('/pets/{id}', [PetController::class, 'show']);
+
+    // Hosts
+    Route::apiResource('hosts', HostController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+
+    // Cuidadores y empresas (usuarios por rol)
+    Route::get('/cuidadores', fn() => User::where('role', 'cuidador')->get());
+    Route::get('/users', function (Request $request) {
+        $role = $request->query('role');
+        return $role ? User::where('role', $role)->get() : User::all();
+    });
+
+    // Empresas específicas con controlador
+    Route::get('/empresas', [UserController::class, 'indexEmpresas']);
 });
 
-Route::middleware('auth:sanctum')->get('/pets/{id}', [PetController::class, 'show']);
+/*
+|--------------------------------------------------------------------------
+| Ruta de depuración (opcional, eliminar en producción)
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/check', function (\Illuminate\Http\Request $request) {
+Route::get('/check', function (Request $request) {
     return response()->json([
         'cookies' => $_COOKIE,
         'session' => session()->all(),
         'user' => $request->user(),
     ]);
 });
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('hosts', HostController::class);
-});
-
-Route::middleware('auth:sanctum')->get('/hosts', [HostController::class, 'index']);
-
-

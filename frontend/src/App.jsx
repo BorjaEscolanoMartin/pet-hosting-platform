@@ -6,9 +6,10 @@ import PrivateRoute from './components/PrivateRoute'
 import GuestRoute from './components/GuestRoute'
 import Pets from './pages/Pets'
 import PetsDetail from './pages/PetsDetail'
-import Hosts from './components/Hosts'
+import Cuidadores from './components/Cuidadores'
 import DashboardCuidador from './pages/DashboardCuidador'
 import DashboardEmpresa from './pages/DashboardEmpresa'
+import Empresas from './components/Empresas'
 
 function App() {
   return (
@@ -61,7 +62,7 @@ function App() {
           path="/cuidadores" 
           element={
             <PrivateRoute>
-              <Hosts />
+              <Cuidadores />
             </PrivateRoute>
           } 
         />
@@ -78,6 +79,14 @@ function App() {
           element={
             <PrivateRoute>
               <DashboardEmpresa />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/empresas"
+          element={
+            <PrivateRoute>
+              <Empresas />
             </PrivateRoute>
           }
         />

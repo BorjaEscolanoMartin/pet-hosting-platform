@@ -51,6 +51,13 @@ export default function Dashboard() {
           >
             Ver Cuidadores
           </Link>
+          <Link
+            to="/empresas"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Ver Empresas
+          </Link>
+
 
           <button
             onClick={handleLogout}
