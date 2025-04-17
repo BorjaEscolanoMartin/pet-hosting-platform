@@ -33,7 +33,18 @@ export default function Login() {
         },
       })
 
-      navigate('/')
+      // 4. Obtener el usuario autenticado
+      const res = await api.get('/user')
+      const role = res.data.role
+
+      // 5. Redirigir según el rol
+      if (role === 'cliente') {
+        navigate('/dashboard')
+      } else if (role === 'cuidador') {
+        navigate('/dashboard-cuidador')
+      } else if (role === 'empresa') {
+        navigate('/dashboard-empresa')
+      }
 
     } catch (err) {
       console.error(err)

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
@@ -7,20 +7,18 @@ import GuestRoute from './components/GuestRoute'
 import Pets from './pages/Pets'
 import PetsDetail from './pages/PetsDetail'
 import Hosts from './components/Hosts'
-import { Link } from 'react-router-dom';
+import DashboardCuidador from './pages/DashboardCuidador'
+import DashboardEmpresa from './pages/DashboardEmpresa'
 
 function App() {
   return (
     <Router>
-      <nav className="bg-white shadow p-4 flex gap-6 text-blue-600 font-semibold mb-6">
-        <Link to="/" className="hover:underline">Dashboard</Link>
-        <Link to="/mascotas" className="hover:underline">Mis Mascotas</Link>
-        <Link to="/cuidadores" className="hover:underline">Cuidadores</Link>
-      </nav>
-
       <Routes>
+        {/* Redirección automática al dashboard */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <PrivateRoute>
               <Dashboard />
@@ -48,22 +46,40 @@ function App() {
           element={
             <PrivateRoute>
               <Pets />
-          </PrivateRoute>
+            </PrivateRoute>
           }    
         />
         <Route 
           path="/mascotas/:id" 
           element={
-          <PrivateRoute>
-            <PetsDetail />
-          </PrivateRoute>} />
-          <Route 
+            <PrivateRoute>
+              <PetsDetail />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
           path="/cuidadores" 
           element={
             <PrivateRoute>
               <Hosts />
             </PrivateRoute>
           } 
+        />
+        <Route
+          path="/dashboard-cuidador"
+          element={
+            <PrivateRoute>
+              <DashboardCuidador />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard-empresa"
+          element={
+            <PrivateRoute>
+              <DashboardEmpresa />
+            </PrivateRoute>
+          }
         />
       </Routes>
     </Router>
