@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\PetController;
 
 // Login
 Route::post('/login', function (Request $request) {
@@ -61,6 +62,13 @@ Route::post('/logout', function (Request $request) {
 // Ruta protegida
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/pets', [PetController::class, 'index']);
+    Route::post('/pets', [PetController::class, 'store']);
+    Route::put('/pets/{id}', [PetController::class, 'update']);
+    Route::delete('/pets/{id}', [PetController::class, 'destroy']);
 });
 
 Route::get('/check', function (\Illuminate\Http\Request $request) {

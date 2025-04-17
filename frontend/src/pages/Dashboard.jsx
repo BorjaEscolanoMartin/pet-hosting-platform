@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../lib/axios'
 import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 export default function Dashboard() {
   const [user, setUser] = useState(null)
@@ -38,6 +39,12 @@ export default function Dashboard() {
       {user ? (
         <>
           <h1 className="text-xl font-bold mb-4">Hola, {user.name} ({user.role})</h1>
+          <Link
+            to="/mascotas"
+            className="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Gestionar mascotas
+          </Link>
           <button
             onClick={handleLogout}
             className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
@@ -49,6 +56,7 @@ export default function Dashboard() {
         <p>Cargando usuario o no autenticado</p>
       )}
     </div>
+
   )
 }
 

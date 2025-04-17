@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import PrivateRoute from './components/PrivateRoute'
 import GuestRoute from './components/GuestRoute'
+import Pets from './pages/Pets'
 
 function App() {
   return (
@@ -33,6 +34,12 @@ function App() {
             </GuestRoute>
           }
         />
+        <Route 
+          path="/mascotas" 
+          element={
+          <PrivateRoute>
+            <Pets />
+          </PrivateRoute>} />
       </Routes>
     </Router>
   )
