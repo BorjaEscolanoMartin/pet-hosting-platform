@@ -10,6 +10,10 @@ import Cuidadores from './components/Cuidadores'
 import DashboardCuidador from './pages/DashboardCuidador'
 import DashboardEmpresa from './pages/DashboardEmpresa'
 import Empresas from './components/Empresas'
+import HostProfile from './pages/HostProfile'
+import PerfilCuidador from './pages/PerfilCuidador'
+import MisReservas from './pages/MisReservas'
+import ReservasRecibidas from './pages/ReservasRecibidas'
 
 function App() {
   return (
@@ -87,6 +91,38 @@ function App() {
           element={
             <PrivateRoute>
               <Empresas />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/mi-perfil-cuidador"
+          element={
+            <PrivateRoute>
+              <HostProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/cuidadores/:id"
+          element={
+            <PrivateRoute>
+              <PerfilCuidador />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/mis-reservas"
+          element={
+            <PrivateRoute>
+              <MisReservas />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reservas-recibidas"
+          element={
+            <PrivateRoute>
+              <ReservasRecibidas />
             </PrivateRoute>
           }
         />

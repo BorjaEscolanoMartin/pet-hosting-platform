@@ -26,9 +26,9 @@ class HostController extends Controller
         return response()->json($host, 201);
     }
 
-    public function show(Request $request, $id)
+    public function show($id)
     {
-        $host = $request->user()->hosts()->findOrFail($id);
+        $host = Host::findOrFail($id);
         return response()->json($host);
     }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../lib/axios'
 import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 export default function DashboardEmpresa() {
   const [user, setUser] = useState(null)
@@ -44,6 +45,13 @@ export default function DashboardEmpresa() {
           <p className="mb-4 text-gray-700">
             Desde este panel podrás gestionar los servicios que tu empresa ofrece a los clientes.
           </p>
+
+          <Link
+            to="/mi-perfil-cuidador"
+            className="inline-block bg-green-600 text-white px-4 py-2 rounded mb-4"
+          >
+            Gestionar mi perfil de cuidador
+          </Link>
 
           <button
             onClick={handleLogout}

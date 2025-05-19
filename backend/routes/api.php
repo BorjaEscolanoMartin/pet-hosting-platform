@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\HostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReservationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +100,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Empresas específicas con controlador
     Route::get('/empresas', [UserController::class, 'indexEmpresas']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/reservations', [ReservationController::class, 'index']);
+    Route::get('/reservations/host', [ReservationController::class, 'forHost']);
+    Route::post('/reservations', [ReservationController::class, 'store']);
+    Route::put('/reservations/{id}', [ReservationController::class, 'update']);
+});
+
 });
 
 /*
@@ -113,4 +122,8 @@ Route::get('/check', function (Request $request) {
         'session' => session()->all(),
         'user' => $request->user(),
     ]);
+});
+
+Route::get('/cuidadores', function () {
+    return User::where('role', 'cuidador')->with('hosts')->get();
 });

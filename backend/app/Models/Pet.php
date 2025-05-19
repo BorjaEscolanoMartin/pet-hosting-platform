@@ -38,6 +38,11 @@ class Pet extends Model
         return $this->belongsTo(Host::class);
     }
 
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
 }
 
 

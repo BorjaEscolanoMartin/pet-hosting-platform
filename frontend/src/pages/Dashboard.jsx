@@ -57,7 +57,12 @@ export default function Dashboard() {
           >
             Ver Empresas
           </Link>
-
+          <Link
+            to="/mis-reservas"
+            className="inline-block bg-indigo-600 text-white px-4 py-2 rounded mt-4"
+          >
+            Ver mis reservas
+          </Link>
 
           <button
             onClick={handleLogout}

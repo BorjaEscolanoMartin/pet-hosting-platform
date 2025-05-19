@@ -30,6 +30,16 @@ export default function Cuidadores() {
           <li key={cuidador.id} className="bg-gray-100 p-4 rounded shadow">
             <p><strong>Nombre:</strong> {cuidador.name}</p>
             <p><strong>Email:</strong> {cuidador.email}</p>
+            {cuidador.hosts.length > 0 ? (
+              <Link
+                to={`/cuidadores/${cuidador.hosts[0].id}`}
+                className="text-blue-600 underline text-sm mt-2 inline-block"
+              >
+                Ver perfil
+              </Link>
+            ) : (
+              <p className="text-sm text-gray-500 italic">Perfil no disponible</p>
+            )}
           </li>
         ))}
       </ul>

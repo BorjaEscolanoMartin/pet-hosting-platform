@@ -27,5 +27,10 @@ class Host extends Model
         return $this->hasMany(Pet::class);
     }
 
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
 }
 

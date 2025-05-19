@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../lib/axios'
 import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 export default function DashboardCuidador() {
   const [user, setUser] = useState(null)
@@ -45,6 +46,20 @@ export default function DashboardCuidador() {
           <p className="mb-4 text-gray-700">
             Desde aquí podrás gestionar tu perfil como cuidador y los servicios que ofreces.
           </p>
+
+          <Link
+            to="/mi-perfil-cuidador"
+            className="inline-block bg-green-600 text-white px-4 py-2 rounded mb-4"
+          >
+            Gestionar mi perfil de cuidador
+          </Link>
+
+          <Link
+            to="/reservas-recibidas"
+            className="inline-block bg-indigo-600 text-white px-4 py-2 rounded mt-4"
+          >
+            Ver reservas recibidas
+          </Link>
 
           <button
             onClick={handleLogout}
