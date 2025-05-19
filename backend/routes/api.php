@@ -11,6 +11,7 @@ use App\Http\Controllers\PetController;
 use App\Http\Controllers\HostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\CuidadoresController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,6 +70,8 @@ Route::post('/logout', function (Request $request) {
     return response()->json(['message' => 'Sesión cerrada']);
 });
 
+Route::get('/cuidadores', [CuidadoresController::class, 'index']);
+
 /*
 |--------------------------------------------------------------------------
 | Rutas Protegidas con Sanctum
@@ -81,6 +84,8 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    Route::put('/user', [UserController::class, 'update']);
+
     // Mascotas
     Route::get('/pets', [PetController::class, 'index']);
     Route::post('/pets', [PetController::class, 'store']);
@@ -92,11 +97,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('hosts', HostController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
 
     // Cuidadores y empresas (usuarios por rol)
-    Route::get('/cuidadores', fn() => User::where('role', 'cuidador')->get());
     Route::get('/users', function (Request $request) {
         $role = $request->query('role');
         return $role ? User::where('role', $role)->get() : User::all();
     });
+
+    Route::get('/users/{id}', [UserController::class, 'show']);
 
     // Empresas específicas con controlador
     Route::get('/empresas', [UserController::class, 'indexEmpresas']);
@@ -122,8 +128,4 @@ Route::get('/check', function (Request $request) {
         'session' => session()->all(),
         'user' => $request->user(),
     ]);
-});
-
-Route::get('/cuidadores', function () {
-    return User::where('role', 'cuidador')->with('hosts')->get();
 });

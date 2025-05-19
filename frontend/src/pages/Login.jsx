@@ -2,48 +2,52 @@ import { useState } from 'react'
 import axios from 'axios'
 import api from '../lib/axios'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
   const navigate = useNavigate()
+  const { setUser } = useAuth()
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError(null)
 
     try {
-      // 1. Obtener cookie CSRF
-      await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
-        withCredentials: true,
-      })
+      await axios.get('http://localhost:8000/sanctum/csrf-cookie', { withCredentials: true })
 
-      // 2. Extraer token XSRF de cookie
       const xsrf = decodeURIComponent(
-        document.cookie
-          .split('; ')
-          .find(row => row.startsWith('XSRF-TOKEN='))?.split('=')[1]
+        document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='))?.split('=')[1]
       )
 
-      // 3. Enviar credenciales
       await api.post('/login', { email, password }, {
         headers: {
           'X-XSRF-TOKEN': xsrf,
         },
       })
 
-      // 4. Obtener el usuario autenticado
       const res = await api.get('/user')
-      const role = res.data.role
+      setUser(res.data)
 
-      // 5. Redirigir según el rol
-      if (role === 'cliente') {
-        navigate('/dashboard')
-      } else if (role === 'cuidador') {
-        navigate('/dashboard-cuidador')
-      } else if (role === 'empresa') {
-        navigate('/dashboard-empresa')
+      const redirectTo = localStorage.getItem('redirectAfterLogin')
+
+      localStorage.removeItem('redirectAfterLogin')
+
+      if (redirectTo) {
+        navigate(redirectTo)
+      } else {
+        // redirigir según rol
+        if (res.data.role === 'cliente') {
+          navigate('/')
+        } else if (res.data.role === 'cuidador') {
+          navigate('/')
+        } else if (res.data.role === 'empresa') {
+          navigate('/')
+        } else {
+          navigate('/') // fallback
+        }
       }
 
     } catch (err) {

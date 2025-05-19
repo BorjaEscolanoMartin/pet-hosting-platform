@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import api from '../lib/axios'
+import { useAuth } from '../context/AuthContext'
 
 export default function ReservaForm() {
-  const { id: hostId } = useParams() // cuidador/host
+  const { id: hostId } = useParams()
+  const { user, loading } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [form, setForm] = useState({
     pet_id: '',
     service_type: 'alojamiento',
@@ -13,15 +18,18 @@ export default function ReservaForm() {
     end_date: '',
     size: '',
   })
+
   const [mascotas, setMascotas] = useState([])
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    api.get('/pets')
-      .then(res => setMascotas(res.data))
-      .catch(() => setError('Error cargando tus mascotas'))
-  }, [])
+    if (user) {
+      api.get('/pets')
+        .then(res => setMascotas(res.data))
+        .catch(() => setError('Error cargando tus mascotas'))
+    }
+  }, [user])
 
   const handleChange = e => {
     const { name, value } = e.target
@@ -43,6 +51,25 @@ export default function ReservaForm() {
       console.error(err)
       setError('No se pudo crear la reserva.')
     }
+  }
+
+  if (loading) return <p className="text-center mt-6">Cargando...</p>
+
+  if (!user) {
+    return (
+      <div className="mt-6 text-center">
+        <p className="text-gray-700">Para contactar con este cuidador debes iniciar sesión.</p>
+        <button
+          onClick={() => {
+            localStorage.setItem('redirectAfterLogin', location.pathname)
+            navigate('/login')
+          }}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Iniciar sesión
+        </button>
+      </div>
+    )
   }
 
   return (

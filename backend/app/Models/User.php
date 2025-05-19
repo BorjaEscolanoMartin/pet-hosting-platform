@@ -36,18 +36,19 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'tamanos_aceptados' => 'array',
+        'especie_preferida' => 'array',
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
 
     public function pets()
     {
@@ -68,7 +69,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Reservation::class);
     }
-
-
-
 }

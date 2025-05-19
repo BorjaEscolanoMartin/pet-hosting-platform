@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
@@ -14,67 +14,35 @@ import HostProfile from './pages/HostProfile'
 import PerfilCuidador from './pages/PerfilCuidador'
 import MisReservas from './pages/MisReservas'
 import ReservasRecibidas from './pages/ReservasRecibidas'
+import Inicio from './pages/Inicio'
+import Layout from './layout/Layout'
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Redirección automática al dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Rutas públicas con Layout */}
+        <Route path="/" element={<Layout><Inicio /></Layout>} />
+        <Route path="/cuidadores" element={<Layout><Cuidadores /></Layout>} />
 
+        {/* Rutas de invitado (sin layout) */}
+        <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+        <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+
+        {/* Rutas protegidas con Layout */}
         <Route
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard />
+              <Layout><Dashboard /></Layout>
             </PrivateRoute>
           }
-        />
-        <Route
-          path="/login"
-          element={
-            <GuestRoute>
-              <Login />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <GuestRoute>
-              <Register />
-            </GuestRoute>
-          }
-        />
-        <Route 
-          path="/mascotas" 
-          element={
-            <PrivateRoute>
-              <Pets />
-            </PrivateRoute>
-          }    
-        />
-        <Route 
-          path="/mascotas/:id" 
-          element={
-            <PrivateRoute>
-              <PetsDetail />
-            </PrivateRoute>
-          } 
-        />
-        <Route 
-          path="/cuidadores" 
-          element={
-            <PrivateRoute>
-              <Cuidadores />
-            </PrivateRoute>
-          } 
         />
         <Route
           path="/dashboard-cuidador"
           element={
             <PrivateRoute>
-              <DashboardCuidador />
+              <Layout><DashboardCuidador /></Layout>
             </PrivateRoute>
           }
         />
@@ -82,7 +50,23 @@ function App() {
           path="/dashboard-empresa"
           element={
             <PrivateRoute>
-              <DashboardEmpresa />
+              <Layout><DashboardEmpresa /></Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/mascotas"
+          element={
+            <PrivateRoute>
+              <Layout><Pets /></Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/mascotas/:id"
+          element={
+            <PrivateRoute>
+              <Layout><PetsDetail /></Layout>
             </PrivateRoute>
           }
         />
@@ -90,7 +74,7 @@ function App() {
           path="/empresas"
           element={
             <PrivateRoute>
-              <Empresas />
+              <Layout><Empresas /></Layout>
             </PrivateRoute>
           }
         />
@@ -98,7 +82,7 @@ function App() {
           path="/mi-perfil-cuidador"
           element={
             <PrivateRoute>
-              <HostProfile />
+              <Layout><HostProfile /></Layout>
             </PrivateRoute>
           }
         />
@@ -106,7 +90,7 @@ function App() {
           path="/cuidadores/:id"
           element={
             <PrivateRoute>
-              <PerfilCuidador />
+              <Layout><PerfilCuidador /></Layout>
             </PrivateRoute>
           }
         />
@@ -114,7 +98,7 @@ function App() {
           path="/mis-reservas"
           element={
             <PrivateRoute>
-              <MisReservas />
+              <Layout><MisReservas /></Layout>
             </PrivateRoute>
           }
         />
@@ -122,7 +106,7 @@ function App() {
           path="/reservas-recibidas"
           element={
             <PrivateRoute>
-              <ReservasRecibidas />
+              <Layout><ReservasRecibidas /></Layout>
             </PrivateRoute>
           }
         />
@@ -132,3 +116,4 @@ function App() {
 }
 
 export default App
+

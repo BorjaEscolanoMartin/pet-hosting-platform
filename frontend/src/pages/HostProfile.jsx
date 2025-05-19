@@ -1,83 +1,91 @@
-// src/pages/HostProfile.jsx
-import { useEffect, useState } from 'react';
-import api from '../lib/axios';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useEffect, useState } from 'react'
+import api from '../lib/axios'
+import { Link } from 'react-router-dom'
 
 export default function HostProfile() {
-  const [form, setForm] = useState({
+  const [host, setHost] = useState({
     name: '',
     type: 'particular',
     location: '',
     description: '',
-  });
+  })
 
-  const [hostId, setHostId] = useState(null);
-  const [success, setSuccess] = useState(false);
-  const navigate = useNavigate();
+  const [tamanos, setTamanos] = useState([])
+  const [especies, setEspecies] = useState([])
 
+  const [success, setSuccess] = useState('')
+  const [error, setError] = useState('')
+
+  // Cargar datos existentes
   useEffect(() => {
-    // Obtener host actual del usuario
     api.get('/hosts')
       .then(res => {
         if (res.data.length > 0) {
-          const host = res.data[0]; // asumimos solo uno
-          setForm({
-            name: host.name,
-            type: host.type,
-            location: host.location,
-            description: host.description,
-          });
-          setHostId(host.id);
+          setHost(res.data[0])
         }
       })
-      .catch(err => {
-        console.error('Error cargando host:', err);
-      });
-  }, []);
 
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
+    api.get('/user')
+      .then(res => {
+        setTamanos(res.data.tamanos_aceptados || [])
+        setEspecies(res.data.especie_preferida || [])
+      })
+      .catch(() => setError('Error al cargar tus datos'))
+  }, [])
 
+  // Guardar perfil completo
   const handleSubmit = async e => {
-    e.preventDefault();
-    setSuccess(false);
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+
     try {
-      await axios.get('http://localhost:8000/sanctum/csrf-cookie', { withCredentials: true })
-      if (hostId) {
-        await api.put(`/hosts/${hostId}`, form);
+      // 1. Actualizar host
+      if (host.id) {
+        await api.put(`/hosts/${host.id}`, host)
       } else {
-        const res = await api.post('/hosts', form);
-        setHostId(res.data.id);
+        await api.post('/hosts', host)
       }
-      setSuccess(true);
+
+      // 2. Actualizar preferencias del user
+      await api.put('/user', {
+        tamanos_aceptados: tamanos,
+        especie_preferida: especies,
+      })
+
+      setSuccess('Perfil actualizado correctamente ✅')
     } catch (err) {
-      console.error('Error guardando perfil:', err);
+      console.error(err)
+      setError('Error al guardar los datos')
     }
-  };
+  }
+
+  // Utilidad para checkboxes
+  const toggleArrayValue = (array, value) =>
+    array.includes(value)
+      ? array.filter(item => item !== value)
+      : [...array, value]
 
   return (
-    <div className="max-w-xl mx-auto mt-10">
+    <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Perfil de Cuidador</h1>
+
+      {success && <p className="text-green-600 mb-2">{success}</p>}
+      {error && <p className="text-red-600 mb-2">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          name="name"
-          placeholder="Nombre del servicio"
-          value={form.name}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
+          placeholder="Nombre del perfil"
+          value={host.name}
+          onChange={e => setHost({ ...host, name: e.target.value })}
+          className="w-full border rounded px-3 py-2"
         />
 
         <select
-          name="type"
-          value={form.type}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
+          value={host.type}
+          onChange={e => setHost({ ...host, type: e.target.value })}
+          className="w-full border rounded px-3 py-2"
         >
           <option value="particular">Particular</option>
           <option value="empresa">Empresa</option>
@@ -85,35 +93,64 @@ export default function HostProfile() {
 
         <input
           type="text"
-          name="location"
           placeholder="Ubicación"
-          value={form.location}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
+          value={host.location}
+          onChange={e => setHost({ ...host, location: e.target.value })}
+          className="w-full border rounded px-3 py-2"
         />
 
         <textarea
-          name="description"
           placeholder="Descripción"
-          value={form.description}
-          onChange={handleChange}
-          className="w-full p-2 border rounded h-32"
+          value={host.description}
+          onChange={e => setHost({ ...host, description: e.target.value })}
+          className="w-full border rounded px-3 py-2"
         />
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          {hostId ? 'Actualizar perfil' : 'Crear perfil'}
-        </button>
+        {/* Preferencias de especie */}
+        <div>
+          <h2 className="font-semibold mb-2">¿Qué tipo de mascota aceptas?</h2>
+          {['perro', 'gato'].map(especie => (
+            <label key={especie} className="block">
+              <input
+                type="checkbox"
+                checked={especies.includes(especie)}
+                onChange={() =>
+                  setEspecies(prev => toggleArrayValue(prev, especie))
+                }
+              />{' '}
+              {especie.charAt(0).toUpperCase() + especie.slice(1)}
+            </label>
+          ))}
+        </div>
 
-        {success && <p className="text-green-600">Perfil guardado correctamente ✅</p>}
+        {/* Preferencias de tamaño */}
+        <div>
+          <h2 className="font-semibold mb-2">¿Qué tamaños aceptas?</h2>
+          {['pequeño', 'mediano', 'grande', 'gigante'].map(t => (
+            <label key={t} className="block">
+              <input
+                type="checkbox"
+                checked={tamanos.includes(t)}
+                onChange={() =>
+                  setTamanos(prev => toggleArrayValue(prev, t))
+                }
+              />{' '}
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </label>
+          ))}
+        </div>
+
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Actualizar perfil
+        </button>
       </form>
 
-      <button
-        onClick={() => navigate(-1)}
-        className="mt-6 underline text-sm text-gray-600"
-      >
+      <Link to="/dashboard-cuidador" className="block mt-6 text-sm text-blue-600 hover:underline">
         ← Volver al panel
-      </button>
+      </Link>
     </div>
-  );
+  )
 }
