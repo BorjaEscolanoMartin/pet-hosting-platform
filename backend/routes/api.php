@@ -47,6 +47,7 @@ Route::post('/register', function (Request $request) {
         'email' => 'required|email|unique:users',
         'password' => 'required|string|min:6',
         'role' => 'required|in:cliente,cuidador,empresa',
+        'postal_code' => 'required|string|max:5',
     ]);
 
     $user = User::create([
@@ -54,6 +55,7 @@ Route::post('/register', function (Request $request) {
         'email' => $request->email,
         'password' => bcrypt($request->password),
         'role' => $request->role,
+        'postal_code' => $request->postal_code,
     ]);
 
     Auth::login($user);

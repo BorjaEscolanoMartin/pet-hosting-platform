@@ -11,6 +11,7 @@ export default function Register() {
     email: '',
     password: '',
     role: 'cliente',
+    postal_code: '',
   })
 
   const [error, setError] = useState(null)
@@ -23,27 +24,27 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
-  
+
     try {
       // 1. Obtener la cookie CSRF
       await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
         withCredentials: true,
       })
-  
-      // 2. Extraer el XSRF-TOKEN manualmente desde las cookies
+
+      // 2. Extraer el token CSRF desde las cookies
       const xsrf = decodeURIComponent(
         document.cookie
           .split('; ')
           .find(row => row.startsWith('XSRF-TOKEN='))?.split('=')[1]
       )
-  
-      // 3. Enviar el formulario con el header forzado
+
+      // 3. Enviar el formulario con el token CSRF
       await api.post('/register', form, {
         headers: {
           'X-XSRF-TOKEN': xsrf,
         },
       })
-  
+
       setSuccess(true)
       navigate('/')
 
@@ -51,7 +52,7 @@ export default function Register() {
       console.error(err)
       setError('Error al registrar usuario')
     }
-  }  
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -95,6 +96,15 @@ export default function Register() {
           <option value="cuidador">Cuidador</option>
           <option value="empresa">Empresa</option>
         </select>
+
+        <input
+          type="text"
+          name="postal_code"
+          className="w-full border px-3 py-2 rounded"
+          placeholder="Código postal"
+          value={form.postal_code}
+          onChange={handleChange}
+        />
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
         {success && <p className="text-green-600 text-sm">¡Registro exitoso!</p>}
