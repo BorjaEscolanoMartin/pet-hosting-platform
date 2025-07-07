@@ -14,11 +14,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    host: '0.0.0.0', // <- Importante para acceder desde fuera (como ngrok o red local)
-    port: 5173,      // <- O el puerto que uses
-    strictPort: true,
-    allowedHosts: ['all'], // <- Permitir todos los hosts (o puedes poner manualmente el subdominio de ngrok)
-    origin: 'https://e963-95-62-80-190.ngrok-free.app', // <- A veces Vite también valida esto
-  },
 })
